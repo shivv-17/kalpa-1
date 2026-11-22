@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalpa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+
+  <div id="scrollProgress"></div>
+  <canvas id="earth-canvas" title="Drag to orbit or click India to scan"></canvas>
+  <div class="vignette"></div>
+
+  <!-- Top Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-40 px-6 md:px-8 py-4 flex items-center justify-between gap-4 pointer-events-none">
+    <button onclick="openAboutModal()" class="pointer-events-auto flex items-center gap-2.5 group text-left shrink-0" title="About Kalpa & Data Sources">
+      <div class="w-3 h-3 rounded-full bg-sky-400 shadow-[0_0_16px_#38bdf8] group-hover:scale-125 transition"></div>
+      <span class="brand-font text-xl md:text-2xl font-bold tracking-[0.22em] uppercase text-white group-hover:text-sky-300 transition">Kalpa</span>
+    </button>
+
+    <div id="navSectionLinks" class="hidden xl:flex items-center gap-3 px-4 py-1.5 rounded-full bg-[#090e1a]/65 backdrop-blur-md border border-white/10 text-[10px] uppercase tracking-[0.14em] text-slate-400 pointer-events-auto transition-opacity duration-300">
+      <a href="#terrain" class="hover:text-white transition">01 Terrain</a>
+      <span class="text-white/15">·</span>
+      <a href="#orbit" class="hover:text-white transition">02 Orbit</a>
+      <span class="text-white/15">·</span>
+      <a href="#facts" class="hover:text-white transition">03 Facts</a>
+      <span class="text-white/15">·</span>
+      <a href="#hazards" class="hover:text-white transition">04 Hazards</a>
+      <span class="text-white/15">·</span>
+      <a href="#resources" class="hover:text-white transition">05 Water &amp; Solar</a>
+      <span class="text-white/15">·</span>
+      <a href="#plinth" class="hover:text-white transition">06 Plinth</a>
+      <span class="text-white/15">·</span>
+      <a href="#playbook" class="hover:text-white transition">07 Playbook</a>
+      <span class="text-white/15">·</span>
+      <a href="#readiness" class="text-sky-300 hover:text-white font-semibold transition">08 Scan</a>
+    </div>
+
+    <button id="topScanBtn" onclick="openAudit()" class="pointer-events-auto px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-[0.18em] bg-white text-slate-950 hover:bg-sky-300 transition shadow-[0_0_25px_rgba(255,255,255,0.2)] shrink-0">
+      Scan Land
+    </button>
+  </nav>
+
+  <!-- HOME STORY SECTIONS -->
+  <main id="homeStory">
+    <section id="hero" class="slide-section">
+      <div class="max-w-xl reveal-3d active">
+        <p class="text-xs uppercase tracking-[0.3em] text-sky-400 mb-4 font-medium">Orbital Land Intelligence</p>
+        <h1 class="text-5xl md:text-7xl font-bold tracking-tight leading-[1.04] text-white">
+          Know the place<br/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-indigo-300 to-cyan-200">
+            before you build.
+          </span>
+        </h1>
+        <p class="mt-6 text-base md:text-lg text-slate-300/90 font-light leading-relaxed">
+          Kalpa pairs archival land-use intelligence with 3D elevation physics and natural hazard context to help buyers and builders evaluate Indian plots with clarity.
+        </p>
+        <div class="mt-9 flex flex-wrap items-center gap-4 pointer-events-auto">
+          <button onclick="openAudit()" class="px-7 py-3.5 rounded-full bg-sky-400 text-slate-950 font-semibold text-sm tracking-wide hover:bg-sky-300 transition shadow-[0_0_30px_rgba(56,189,248,0.35)]">
+            Launch Terrain Audit →
+          </button>
+          <a href="#terrain" class="px-6 py-3.5 rounded-full border border-white/15 text-sm text-slate-300 hover:border-white/40 hover:text-white transition">
+            Scroll to Explore
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="terrain" class="slide-section justify-end">
+      <div class="glass-panel p-8 md:p-10 rounded-3xl max-w-xl reveal-3d">
+        <span class="text-xs uppercase tracking-[0.25em] text-rose-400 font-semibold">01 — Terrain &amp; Subsurface Physics</span>
+        <h2 class="text-3xl md:text-4xl font-bold mt-3 text-white leading-tight">
+          Surface brochures hide decades of water memory.
+        </h2>
+        <p class="mt-3.5 text-sm text-slate-300 leading-relaxed font-light">
+          A plot that looks flat and dry in April can sit inside a micro-basin, an expansive clay belt, or a filled seasonal drainage line once monsoon runoff arrives.
+        </p>
+        <div class="mt-5 space-y-2.5 text-xs">
+          <div class="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.07]">
+            <span class="font-semibold text-white">Micro-Topography &amp; Basin Bowls:</span>
+            <span class="text-slate-400"> A 1.5–2.5 m drop below surrounding roads turns a dry plot into a monsoon runoff bowl.</span>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.07]">
+            <span class="font-semibold text-white">Sub-Base Soil &amp; Plinth Load:</span>
+            <span class="text-slate-400"> Black cotton clay, alluvial silt, and murum respond differently to moisture and foundation load.</span>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.07]">
+            <span class="font-semibold text-white">Historical Drainage Channels:</span>
+            <span class="text-slate-400"> Leveled ponds and seasonal nalas often retain subsurface seepage paths after grading.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="orbit" class="slide-section justify-start">
+      <div class="glass-panel p-8 md:p-10 rounded-3xl max-w-2xl reveal-3d">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs uppercase tracking-[0.25em] text-sky-400 font-semibold">02 — Orbit Data</span>
+          <span class="text-[11px] font-mono text-slate-400">Satellite Telemetry • 9-Point Grid</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold mt-2.5 text-white leading-tight">
+          Four orbital &amp; terrain layers weighted into one score.
+        </h2>
+
+        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <button type="button" onclick="selectPillar('elevation')" id="pillar-elevation"
+            class="p-3.5 rounded-2xl bg-sky-500/15 border border-sky-400/40 text-left transition">
+            <div class="flex justify-between items-center">
+              <span class="font-semibold text-white">Relative Elevation &amp; Slope</span>
+              <span class="text-sky-300 font-mono text-xs">35%</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Compares plot height against 8 surrounding points</p>
+          </button>
+
+          <button type="button" onclick="selectPillar('waterbody')" id="pillar-waterbody"
+            class="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/20 text-left transition">
+            <div class="flex justify-between items-center">
+              <span class="font-semibold text-white">Waterbody &amp; LULC History</span>
+              <span class="text-sky-400 font-mono text-xs">30%</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Flags wetland, tank, or drainage basin history</p>
+          </button>
+
+          <button type="button" onclick="selectPillar('groundwater')" id="pillar-groundwater"
+            class="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/20 text-left transition">
+            <div class="flex justify-between items-center">
+              <span class="font-semibold text-white">Aquifer &amp; Soil Context</span>
+              <span class="text-sky-400 font-mono text-xs">20%</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Regional groundwater depth &amp; sub-base profile</p>
+          </button>
+
+          <button type="button" onclick="selectPillar('climate')" id="pillar-climate"
+            class="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/20 text-left transition">
+            <div class="flex justify-between items-center">
+              <span class="font-semibold text-white">Rainwater &amp; Solar Yield</span>
+              <span class="text-sky-400 font-mono text-xs">15%</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Monsoon harvest volume &amp; daily solar potential</p>
+          </button>
+        </div>
+
+        <div id="pillarDetailBox" class="mt-4 p-4 rounded-2xl bg-white/[0.04] border border-white/10 text-xs text-slate-200 leading-relaxed">
+          <span class="text-sky-400 font-semibold uppercase tracking-wider">What It Catches: </span>
+          <span id="pillarDetailText">Detects if a plot sits lower than neighboring ground (-m delta), where monsoon runoff naturally collects unless the plinth is raised.</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="facts" class="slide-section justify-end">
+      <div class="glass-panel p-8 md:p-10 rounded-3xl max-w-2xl reveal-3d">
+        <span class="text-xs uppercase tracking-[0.25em] text-amber-300 font-semibold">03 — Land &amp; Real Estate Facts</span>
+        <h2 class="text-3xl md:text-4xl font-bold mt-2.5 text-white leading-tight">
+          What smart plot buyers check beyond price per sq.ft.
+        </h2>
+        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs leading-relaxed">
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+            <p class="font-semibold text-white">Dry-Season Inspection Bias</p>
+            <p class="text-slate-400 mt-1">Dry-month site visits hide road-level runoff and seasonal waterlogging until peak monsoon rain.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+            <p class="font-semibold text-white">Pre-Build Plinth Economics</p>
+            <p class="text-slate-400 mt-1">Raising plinth height and grading drains early costs a fraction of post-build dampness repairs.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+            <p class="font-semibold text-white">Infrastructure-Led Corridors</p>
+            <p class="text-slate-400 mt-1">Highway and metro growth belts draw demand, but finished storm drains and utilities drive livability.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+            <p class="font-semibold text-white">Physical + Legal Discipline</p>
+            <p class="text-slate-400 mt-1">RERA and title deeds confirm legal rights; elevation, hazard, and soil checks confirm buildability.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="hazards" class="slide-section items-end justify-start">
+      <div class="glass-panel p-6 md:p-8 rounded-3xl w-full max-w-3xl reveal-3d">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <span class="text-xs uppercase tracking-[0.25em] text-orange-300 font-semibold">04 — Natural Hazard Awareness</span>
+          <span class="text-[11px] text-slate-400">Regional &amp; Terrain Risk Screening</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div class="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+            <p class="font-semibold text-white">Flood &amp; Waterlogging</p>
+            <p class="text-slate-400 mt-1">Low basin elevation plus heavy rainfall raises street and compound water retention risk.</p>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+            <p class="font-semibold text-white">Landslide &amp; Slope</p>
+            <p class="text-slate-400 mt-1">Hilly, ghat, and steep-gradient sites require slope drainage and structural stability checks.</p>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+            <p class="font-semibold text-white">Seismic &amp; Cyclone Belts</p>
+            <p class="text-slate-400 mt-1">Regional seismic and coastal wind/surge exposure calls for code-compliant construction.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="resources" class="slide-section justify-center">
+      <div class="glass-panel p-8 md:p-10 rounded-3xl max-w-3xl w-full reveal-3d">
+        <div class="text-center max-w-xl mx-auto">
+          <span class="text-xs uppercase tracking-[0.25em] text-cyan-300 font-semibold">05 — Water &amp; Solar Yield</span>
+          <h2 class="text-3xl md:text-4xl font-bold mt-2.5 text-white">
+            Turn monsoon rain and sunlight into plot resilience.
+          </h2>
+        </div>
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="p-5 rounded-2xl bg-sky-500/10 border border-sky-400/20">
+            <p class="text-sky-300 font-semibold uppercase tracking-wider">Rainwater Harvesting</p>
+            <p class="text-xl font-bold text-white mt-1.5 tabular-nums">80,000 – 150,000+ L / yr</p>
+            <p class="text-slate-300 mt-2 leading-relaxed">Typical residential roof and plot catch across Indian rainfall belts can recharge groundwater and cut summer water stress.</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-indigo-500/10 border border-indigo-400/20">
+            <p class="text-indigo-300 font-semibold uppercase tracking-wider">Solar &amp; Aquifer Balance</p>
+            <p class="text-xl font-bold text-white mt-1.5 tabular-nums">Strong Year-Round Irradiance</p>
+            <p class="text-slate-300 mt-2 leading-relaxed">Pairing rooftop solar potential with local aquifer awareness helps offset power and pumping costs over time.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="plinth" class="slide-section justify-end">
+      <div class="glass-panel p-8 md:p-10 rounded-3xl max-w-2xl w-full reveal-3d">
+        <span class="text-xs uppercase tracking-[0.25em] text-emerald-300 font-semibold">06 — Plinth &amp; Site Grading</span>
+        <h2 class="text-3xl md:text-4xl font-bold mt-2.5 text-white">
+          A few extra feet of planning saves years of trouble.
+        </h2>
+        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+          <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/25">
+            <p class="font-semibold text-rose-300">Low Plinth / Ignored Runoff</p>
+            <p class="text-slate-300 mt-1.5 leading-relaxed">Road re-surfacing over the years can leave a low plot below street level, leading to seepage, damp walls, and water entry.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25">
+            <p class="font-semibold text-emerald-300">Raised Plinth + Clean Drainage</p>
+            <p class="text-slate-300 mt-1.5 leading-relaxed">Calibrated plinth height, sloped compound grading, and perimeter drains keep entryways dry during heavy downpours.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="playbook" class="slide-section justify-start">
+      <div class="glass-panel p-8 md:p-10 rounded-3xl max-w-xl w-full reveal-3d">
+        <span class="text-xs uppercase tracking-[0.25em] text-purple-300 font-semibold">07 — Buyer &amp; Builder Playbook</span>
+        <h2 class="text-3xl md:text-4xl font-bold mt-2.5 text-white">
+          Four steps before you lock in a plot.
+        </h2>
+        <ol class="mt-5 space-y-3 text-xs text-slate-300">
+          <li class="flex gap-3 items-start">
+            <span class="w-6 h-6 rounded-full bg-sky-400/20 text-sky-300 font-mono font-bold flex items-center justify-center shrink-0">1</span>
+            <span><strong class="text-white">Screen Elevation &amp; Water History:</strong> Check basin depth, slope, and historical land-use before visiting.</span>
+          </li>
+          <li class="flex gap-3 items-start">
+            <span class="w-6 h-6 rounded-full bg-sky-400/20 text-sky-300 font-mono font-bold flex items-center justify-center shrink-0">2</span>
+            <span><strong class="text-white">Inspect Beyond Dry Weather:</strong> Look for drainage channels, road levels, and monsoon pooling signs.</span>
+          </li>
+          <li class="flex gap-3 items-start">
+            <span class="w-6 h-6 rounded-full bg-sky-400/20 text-sky-300 font-mono font-bold flex items-center justify-center shrink-0">3</span>
+            <span><strong class="text-white">Verify Legal &amp; Layout Approvals:</strong> Confirm clear title, boundary demarcation, and applicable RERA/local permissions.</span>
+          </li>
+          <li class="flex gap-3 items-start">
+            <span class="w-6 h-6 rounded-full bg-sky-400/20 text-sky-300 font-mono font-bold flex items-center justify-center shrink-0">4</span>
+            <span><strong class="text-white">Plan Plinth, Water &amp; Solar Early:</strong> Lock in plinth height, recharge pit space, and solar conduit before construction.</span>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="readiness" class="slide-section justify-center text-center">
+      <div class="glass-panel p-10 md:p-14 rounded-3xl max-w-2xl reveal-3d">
+        <p class="text-xs uppercase tracking-[0.3em] text-sky-400 font-semibold">08 — Readiness Audit</p>
+        <h2 class="text-3xl md:text-5xl font-bold mt-4 text-white">
+          Check any place across India.
+        </h2>
+        <p class="mt-4 text-slate-300 font-light text-sm md:text-base max-w-lg mx-auto">
+          Open the analyzer to slide the globe into view, zoom into any searched state, and inspect terrain readiness, hazards, and real estate insights.
+        </p>
+        <button onclick="openAudit()" class="mt-8 px-8 py-4 rounded-full bg-white text-slate-950 font-semibold text-sm tracking-wide hover:bg-sky-300 transition shadow-[0_0_35px_rgba(255,255,255,0.25)]">
+          Open Kalpa Analyzer
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ABOUT KALPA MODAL -->
+  <div id="aboutModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-md p-4">
+    <div class="w-full max-w-xl rounded-3xl bg-[#090e1a] border border-white/15 p-7 md:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-start justify-between gap-4 pb-4 border-b border-white/10">
+        <div>
+          <span class="text-[11px] uppercase tracking-[0.25em] text-sky-400">About &amp; Provenance</span>
+          <h3 class="text-2xl font-bold text-white mt-1">Kalpa</h3>
+        </div>
+        <button onclick="closeAboutModal()" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center text-slate-300">✕</button>
+      </div>
+
+      <div class="mt-5 space-y-4 text-sm text-slate-300 leading-relaxed">
+        <p>
+          <strong class="text-white">What Kalpa is:</strong> A spatial site-readiness advisor built for Indian land buyers, homebuilders, and residents to screen terrain elevation, water memory, natural hazards, and market/building guidance before committing capital.
+        </p>
+        <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2.5 text-xs">
+          <p class="text-[11px] uppercase tracking-widest text-sky-400 font-semibold">Where Data &amp; Calculations Come From</p>
+          <p><strong class="text-white">9-Point Elevation &amp; Weather:</strong> Live elevation grid and precipitation / solar irradiance feeds.</p>
+          <p><strong class="text-white">Geocoding &amp; Map View:</strong> OpenStreetMap Nominatim place lookup paired with interactive map tiles.</p>
+          <p><strong class="text-white">ISRO Bhuvan &amp; Bhujal Framing:</strong> Regional land-use/land-cover (LULC) history, aquifer depth context, and natural hazard exposure across Indian terrain zones.</p>
+        </div>
+        <p class="text-xs text-slate-400">
+          <strong class="text-slate-200">Scope Note:</strong> Kalpa supports early physical and environmental screening. Always verify formal land titles, RERA/municipal approvals, revenue records, and on-site soil testing.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSLUCENT RIGHT-SIDE AUDIT STUDIO -->
+  <div id="auditDrawer" class="fixed inset-0 z-40 hidden items-center justify-end p-4 md:p-6 pt-20 pointer-events-none">
+    <div class="pointer-events-auto w-full max-w-2xl h-[calc(100vh-6rem)] translucent-studio rounded-3xl flex flex-col overflow-hidden">
+
+      <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between gap-3 shrink-0">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] uppercase tracking-[0.25em] text-sky-400 font-semibold">Kalpa Analyzer</span>
+            <span id="stateFocusPill" class="hidden px-2.5 py-0.5 rounded-full bg-sky-400/15 border border-sky-400/30 text-[10px] text-sky-300 font-medium"></span>
+          </div>
+          <h3 class="text-lg font-bold text-white mt-0.5">Search &amp; Evaluate Any Place</h3>
+        </div>
+        <button onclick="closeAudit()" class="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-xs text-slate-200 transition">
+          Close ✕
+        </button>
+      </div>
+
+      <div class="px-6 py-4 border-b border-white/10 space-y-3 shrink-0 bg-white/[0.02]">
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input id="cityInput" type="text" placeholder="Search city, town, or locality (e.g., Bhopal, Gorakhpur)..."
+            class="flex-1 bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-sky-400"
+            onkeydown="if(event.key==='Enter') searchByPlace()" />
+          <button onclick="searchByPlace()" class="px-5 py-2.5 rounded-xl bg-sky-400 text-slate-950 font-semibold text-sm hover:bg-sky-300 transition">
+            Search
+          </button>
+          <button onclick="useCurrentLocation()" class="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-medium text-sky-300 transition whitespace-nowrap">
+            Use My Location
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-xs">
+          <input id="plotSizeInput" type="number" min="200" step="100" value="1600" title="Plot Size"
+            class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white tabular-nums focus:outline-none focus:border-sky-400" />
+          <select id="plotUnitSelect" class="bg-[#0b1222] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-sky-400">
+            <option value="sqft">sq.ft</option>
+            <option value="sqm">sq.m</option>
+          </select>
+          <select id="purposeSelect" class="bg-[#0b1222] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-sky-400">
+            <option value="Buying a Plot">Buying a Plot</option>
+            <option value="Building a House">Building a House</option>
+            <option value="Existing Site Check">Existing Site Check</option>
+          </select>
+        </div>
+
+        <div id="historyBar" class="hidden flex items-center gap-2 overflow-x-auto pt-1 text-[11px]">
+          <span class="text-slate-400 shrink-0">Recent:</span>
+          <div id="historyList" class="flex items-center gap-1.5"></div>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto px-6 py-5">
+        <div id="auditEmptyState" class="py-12 text-center space-y-2">
+          <p class="text-sm text-slate-200 font-medium">Search a place above or click directly on India on the 3D Earth.</p>
+          <p class="text-xs text-slate-400">The globe will zoom into that state's region and load terrain, hazard, and real estate insights.</p>
+        </div>
+
+        <div id="auditError" class="hidden mb-4 p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-xs text-rose-200"></div>
+
+        <div id="auditLoader" class="hidden py-14 text-center">
+          <div class="w-8 h-8 border-2 border-sky-400 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p class="text-xs uppercase tracking-widest text-sky-300">Zooming Region &amp; Analyzing Terrain...</p>
+        </div>
+
+        <div id="auditResult" class="hidden space-y-4">
+          <div class="p-4 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-between gap-4">
+            <div>
+              <p id="resLocation" class="text-base font-bold text-white"></p>
+              <p id="resCoords" class="text-xs text-slate-400 mt-0.5 tabular-nums"></p>
+              <div class="flex flex-wrap items-center gap-2 mt-2">
+                <span id="resBadge" class="px-3 py-1 rounded-full text-[11px] font-bold"></span>
+                <button onclick="copyAuditBrief()" id="copyBriefBtn" class="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[11px] text-slate-200 transition">
+                  Copy Summary
+                </button>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span id="resScore" class="text-5xl font-bold tabular-nums"></span>
+              <span class="block text-[10px] uppercase tracking-widest text-slate-400 mt-1">Kalpa Score</span>
+            </div>
+          </div>
+
+          <div class="flex gap-1.5 p-1 rounded-xl bg-white/[0.04] border border-white/10 text-xs">
+            <button type="button" onclick="switchReportTab('overview')" id="tab-overview"
+              class="flex-1 py-2 rounded-lg bg-sky-400 text-slate-950 font-semibold transition">
+              Terrain &amp; Map
+            </button>
+            <button type="button" onclick="switchReportTab('hazards')" id="tab-hazards"
+              class="flex-1 py-2 rounded-lg text-slate-300 hover:text-white transition">
+              Compare &amp; Hazards
+            </button>
+            <button type="button" onclick="switchReportTab('market')" id="tab-market"
+              class="flex-1 py-2 rounded-lg text-slate-300 hover:text-white transition">
+              Market Facts (6)
+            </button>
+          </div>
+
+          <div id="panel-overview" class="space-y-4">
+            <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/10">
+              <div class="flex items-center justify-between text-[11px] text-slate-400 mb-2 px-1">
+                <span class="uppercase tracking-wider font-semibold text-slate-300">Location Map View</span>
+                <span id="resMetaTag" class="tabular-nums"></span>
+              </div>
+              <div id="locationPinMap"></div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs tabular-nums">
+              <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08]">
+                <p class="text-slate-400 uppercase">Elevation &amp; Delta</p>
+                <p id="resElev" class="text-sm font-semibold text-white mt-1"></p>
+                <p id="resDrainage" class="text-slate-400 mt-1"></p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08]">
+                <p class="text-slate-400 uppercase">Rainwater &amp; Solar</p>
+                <p id="resRain" class="text-sm font-semibold text-white mt-1"></p>
+                <p id="resSolar" class="text-slate-400 mt-1"></p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08]">
+                <p class="text-slate-400 uppercase">Historical LULC</p>
+                <p id="resLulc" class="text-xs font-semibold text-white mt-1 leading-relaxed"></p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08]">
+                <p class="text-slate-400 uppercase">Aquifer &amp; Soil</p>
+                <p id="resGw" class="text-xs font-semibold text-white mt-1 leading-relaxed"></p>
+                <p id="resSoil" class="text-slate-400 mt-1"></p>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-sky-500/10 border border-sky-400/20">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] uppercase tracking-widest text-sky-300 font-semibold">Advisory Verdict</span>
+                <div class="flex gap-1">
+                  <button onclick="switchVerdict('en')" id="langEn" class="px-2 py-0.5 text-[11px] rounded bg-sky-400 text-slate-950 font-bold">EN</button>
+                  <button onclick="switchVerdict('hi')" id="langHi" class="px-2 py-0.5 text-[11px] rounded text-slate-300">हिंदी</button>
+                </div>
+              </div>
+              <p id="resVerdict" class="text-xs leading-relaxed text-slate-200"></p>
+            </div>
+          </div>
+
+          <div id="panel-hazards" class="hidden space-y-4 text-xs">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="text-[11px] uppercase tracking-wider text-sky-300 font-semibold">Build Scenario Comparison</p>
+                <div class="flex gap-1">
+                  <button type="button" onclick="selectScenario('basic')" id="scen-basic"
+                    class="px-2.5 py-1 rounded-lg bg-white/10 text-slate-300 text-[11px] transition">Basic Plinth</button>
+                  <button type="button" onclick="selectScenario('engineered')" id="scen-engineered"
+                    class="px-2.5 py-1 rounded-lg bg-sky-400 text-slate-950 font-semibold text-[11px] transition">Raised + Drain</button>
+                  <button type="button" onclick="selectScenario('resilient')" id="scen-resilient"
+                    class="px-2.5 py-1 rounded-lg bg-white/10 text-slate-300 text-[11px] transition">Full Water &amp; Solar</button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                  <p class="font-semibold text-rose-300">Unprepared / Low Plinth</p>
+                  <p id="plinthUnprepared" class="text-slate-300 mt-1 leading-relaxed"></p>
+                </div>
+                <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  <p id="scenarioTitle" class="font-semibold text-emerald-300">Raised Plinth + Perimeter Drain</p>
+                  <p id="scenarioOutcome" class="text-slate-300 mt-1 leading-relaxed"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-amber-500/[0.07] border border-amber-400/20 space-y-2.5">
+              <p class="text-[11px] uppercase tracking-wider text-amber-300 font-semibold">Natural Disaster &amp; Prone Area Context</p>
+              <div id="hazardList" class="space-y-2.5"></div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+              <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold mb-2">Actionable Next Steps</p>
+              <ul id="resChecklist" class="space-y-1.5 text-slate-300 list-disc pl-4 leading-relaxed"></ul>
+            </div>
+          </div>
+
+          <div id="panel-market" class="hidden space-y-2.5 text-xs">
+            <p class="text-[11px] uppercase tracking-wider text-sky-300 font-semibold px-1">
+              Recent Indian Housing &amp; Land-Purchasing Facts
+            </p>
+            <div id="marketFactsList" class="space-y-2.5"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

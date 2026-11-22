@@ -1,0 +1,110 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #03050a;
+  color: #f8fafc;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .brand-font {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+#earth-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: auto;
+  cursor: grab;
+}
+
+#earth-canvas:active {
+  cursor: grabbing;
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 65% 50%, transparent 25%, rgba(3, 5, 10, 0.86) 85%);
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.6s ease;
+}
+
+body.scan-mode .vignette {
+  opacity: 0.2;
+}
+
+#scrollProgress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  z-index: 50;
+  transition: width 0.12s linear;
+}
+
+#homeStory {
+  transition: opacity 0.45s ease, transform 0.55s ease;
+}
+
+body.scan-mode #homeStory {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-16px);
+}
+
+.slide-section {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 6rem 7vw;
+  pointer-events: none;
+}
+
+.glass-panel {
+  pointer-events: auto;
+  background: rgba(10, 15, 28, 0.60);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+}
+
+.translucent-studio {
+  background: rgba(8, 13, 25, 0.54);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+}
+
+.reveal-3d {
+  opacity: 0;
+  transform: perspective(1000px) translateY(38px) rotateX(4deg);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-3d.active {
+  opacity: 1;
+  transform: perspective(1000px) translateY(0px) rotateX(0deg);
+}
+
+#locationPinMap {
+  height: 175px;
+  width: 100%;
+  border-radius: 14px;
+  z-index: 1;
+}
